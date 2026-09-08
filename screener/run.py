@@ -83,6 +83,21 @@ def main(argv=None) -> int:
     # report 100% breadth for every sector, which tells you nothing.
     investable = gated[gated["g_mcap"] & gated["g_liquidity"]]
     sectors = scoring.sector_table(investable if len(investable) > 20 else gated)
+    # Stage one: rank on everything available without extra network calls.
+    prelim = scoring.composite(gated, sectors)
+
+    # Stage two: pull quarterly results for the names that matter, feed the
+    # earnings acceleration back in, and re-rank. Two passes cost one extra
+    # in-memory sort and save fetching statements for the whole market.
+    shortlist = list(prelim[prelim["eligible"]].sort_values(
+        "composite", ascending=False).head(config.QUARTERLY_MAX).index)
+    quarterly = {} if args.offline_test else data.fetch_quarterly(shortlist)
+
+    for col, key in (("eps_accel", "eps_accel"), ("eps_yoy_q", "eps_yoy_q"),
+                     ("eps_qoq", "eps_qoq"), ("sales_qoq", "sales_qoq")):
+        gated[col] = pd.Series(
+            {t: quarterly.get(t, {}).get(key) for t in gated.index}, dtype=float)
+
     scored = scoring.composite(gated, sectors)
     scored = scoring.sub_scores(scored, sectors)
     ipos = scoring.new_listings(close, volume, meta, rs_bench)
@@ -91,11 +106,6 @@ def main(argv=None) -> int:
     eligible_n = int(scored["eligible"].sum())
     entry_n = int(scored["entry_ok"].sum())
     print(f"  {eligible_n} cleared the gates, {entry_n} are buyable today")
-
-    # Quarterly results, only for the names that will appear on the page.
-    shortlist = list(scored[scored["eligible"]].sort_values(
-        "composite", ascending=False).head(config.QUARTERLY_MAX).index)
-    quarterly = {} if args.offline_test else data.fetch_quarterly(shortlist)
 
     def qtr(t: str, key: str):
         v = quarterly.get(t, {}).get(key)
@@ -156,7 +166,11 @@ def main(argv=None) -> int:
             "sales_growth": float(r["revenue_growth"]) if pd.notna(r.get("revenue_growth")) else None,
             "eps_qoq": qtr(t, "eps_qoq"), "sales_qoq": qtr(t, "sales_qoq"),
             "quarter": quarterly.get(t, {}).get("quarter"),
-            "sector_score": float(r["sector_score"]) if pd.notna(r.get("sector_score")) else None,
+            "emergence_score": float(r["emergence_score"]) if pd.notna(r.get("emergence_score")) else None,
+            "eps_accel": float(r["eps_accel"]) if pd.notna(r.get("eps_accel")) else None,
+            "emergence_score": float(r["emergence_score"]) if pd.notna(r.get("emergence_score")) else None,
+         "eps_accel": float(r["eps_accel"]) if pd.notna(r.get("eps_accel")) else None,
+         "sector_score": float(r["sector_score"]) if pd.notna(r.get("sector_score")) else None,
             "earnings_score": float(r["earnings_score"]) if pd.notna(r.get("earnings_score")) else None,
             "growth_score": float(r["growth_score"]) if pd.notna(r.get("growth_score")) else None,
 
@@ -234,6 +248,8 @@ def main(argv=None) -> int:
          "sales_growth": float(r["revenue_growth"]) if pd.notna(r.get("revenue_growth")) else None,
          "eps_qoq": qtr(t, "eps_qoq"), "sales_qoq": qtr(t, "sales_qoq"),
          "quarter": quarterly.get(t, {}).get("quarter"),
+         "emergence_score": float(r["emergence_score"]) if pd.notna(r.get("emergence_score")) else None,
+         "eps_accel": float(r["eps_accel"]) if pd.notna(r.get("eps_accel")) else None,
          "sector_score": float(r["sector_score"]) if pd.notna(r.get("sector_score")) else None,
          "earnings_score": float(r["earnings_score"]) if pd.notna(r.get("earnings_score")) else None,
          "growth_score": float(r["growth_score"]) if pd.notna(r.get("growth_score")) else None,
