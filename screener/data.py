@@ -399,6 +399,50 @@ def fetch_quarterly(tickers: list[str]) -> dict:
     return {t: cached.get(t, {}) for t in tickers}
 
 
+_EBIT_ROWS = ("EBIT", "Operating Income", "Total Operating Income As Reported")
+_ASSET_ROWS = ("Total Assets",)
+_CURLIAB_ROWS = ("Current Liabilities", "Total Current Liabilities")
+
+
+def fetch_roce(tickers: list[str]) -> dict:
+    """Return on capital employed: EBIT over (total assets less current
+    liabilities). Yahoo has no such field, so it is computed from the
+    statements. Any company whose statements will not parse returns None,
+    and the caller decides what to do with that."""
+    import yfinance as yf
+
+    path = _cache_path("roce.json")
+    cached: dict = {}
+    if os.path.exists(path):
+        try:
+            with open(path) as fh:
+                cached = json.load(fh)
+        except Exception:  # noqa: BLE001
+            cached = {}
+
+    todo = [t for t in tickers if t not in cached]
+    if todo:
+        print(f"  return on capital for {len(todo)} names")
+    for t in todo:
+        val = None
+        try:
+            tk = yf.Ticker(t)
+            inc, bs = tk.income_stmt, tk.balance_sheet
+            ebit = _pick_row(inc, _EBIT_ROWS) if inc is not None and not inc.empty else None
+            assets = _pick_row(bs, _ASSET_ROWS) if bs is not None and not bs.empty else None
+            cl = _pick_row(bs, _CURLIAB_ROWS) if bs is not None and not bs.empty else None
+            if ebit is not None and assets is not None and cl is not None:
+                capital = float(assets.iloc[0]) - float(cl.iloc[0])
+                if capital > 0:
+                    val = float(ebit.iloc[0]) / capital
+        except Exception:  # noqa: BLE001
+            val = None
+        cached[t] = val
+
+    _atomic_json(path, cached)
+    return {t: cached.get(t) for t in tickers}
+
+
 def fetch_rs_benchmark(period: str = "2y") -> pd.Series:
     """Nifty MidSmallcap 400 if Yahoo carries it, otherwise an empty series
     and the caller builds a proxy from the universe."""
