@@ -244,8 +244,9 @@ def quality_flags(df: pd.DataFrame) -> pd.Series:
     checks["profit"] = df["earnings_growth"].fillna(-1) > df["revenue_growth"].fillna(0)
     checks["roe"] = df["roe"].fillna(-1) > 0.15
     checks["leverage"] = df["debt_to_equity"].fillna(999) < 100  # yf reports as %
-    ocf_ratio = df["op_cashflow"].fillna(0) / df["net_income"].replace(0, np.nan)
-    checks["cashflow"] = ocf_ratio.fillna(-1) > 0.6
+    if config.USE_CASHFLOW_CHECK:
+        ocf_ratio = df["op_cashflow"].fillna(0) / df["net_income"].replace(0, np.nan)
+        checks["cashflow"] = ocf_ratio.fillna(-1) > 0.6
     return checks.sum(axis=1)
 
 
@@ -258,11 +259,13 @@ def apply_gates(df: pd.DataFrame) -> pd.DataFrame:
     df["g_price"] = df["price"] >= config.MIN_PRICE
     df["g_above_200"] = df["price"] > df["sma200"]
     df["g_above_50"] = df["price"] > df["sma50"]
-    df["g_golden"] = df["sma50"] > df["sma200"]
-    df["g_slope"] = df["sma200_rising"]
+    if config.REQUIRE_GOLDEN_CROSS:
+        df["g_golden"] = df["sma50"] > df["sma200"]
+    if config.REQUIRE_SMA200_RISING:
+        df["g_slope"] = df["sma200_rising"]
     df["g_near_high"] = df["proximity"] >= (1 - config.MAX_DIST_FROM_52W_HIGH)
     df["quality_score"] = quality_flags(df)
-    df["g_quality"] = df["quality_score"] >= 3
+    df["g_quality"] = df["quality_score"] >= config.QUALITY_MIN_PASSES
 
     gate_cols = [c for c in df.columns if c.startswith("g_")]
     df["eligible"] = df[gate_cols].all(axis=1)
@@ -276,7 +279,8 @@ def apply_gates(df: pd.DataFrame) -> pd.DataFrame:
                    & (df["weekly_rsi"].fillna(999) <= config.WEEKLY_RSI_MAX))
     df["e_ext20"] = df["ext20"].fillna(9) <= config.MAX_EXT_20DMA
     df["e_ext50"] = df["ext50"].fillna(9) <= config.MAX_EXT_50DMA
-    df["e_ext_atr"] = df["ext_atr"].fillna(99) <= config.MAX_EXT_ATR
+    if config.USE_ATR_EXTENSION:
+        df["e_ext_atr"] = df["ext_atr"].fillna(99) <= config.MAX_EXT_ATR
     if config.MAX_1Y_RETURN is not None:
         df["e_run_up"] = df["r12m"].fillna(0) <= config.MAX_1Y_RETURN
     df["e_rs_high"] = (df["rs_days_since_high"].fillna(9999)
