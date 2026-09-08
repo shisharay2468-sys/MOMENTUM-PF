@@ -140,6 +140,28 @@ def compute_metrics(close: pd.DataFrame, volume: pd.DataFrame,
         ext50 = last / sma50 - 1 if sma50 else np.nan
         ext_atr = (last - sma20) / atr20 if atr20 and atr20 > 0 else np.nan
 
+        # --- emergence metrics: is this coiling or already gone?
+        # Volatility contraction: recent range against its own year. Below 1
+        # means the stock has gone quiet, which is what precedes expansion.
+        atr_year = atr(px.tail(d["12m"]), 60)
+        vol_contraction = (atr20 / atr_year) if (atr_year and atr_year > 0) else np.nan
+
+        # Base quality: share of the past year spent within 25% of the
+        # running 52-week high. A long shelf near highs beats a vertical line.
+        roll_high = px.tail(d["12m"]).cummax()
+        near = (px.tail(d["12m"]) / roll_high) >= 0.75
+        base_quality = float(near.mean())
+
+        # Quiet run-up: near the highs while NOT having already tripled.
+        # This is the single most important separator between a stock about
+        # to move and one that already has.
+        quiet_runup = float(proximity / (1 + max(r12, 0)))
+
+        # Volume thrust: recent participation against the longer average.
+        v20 = float(vol.tail(20).mean())
+        v100 = float(vol.tail(100).mean())
+        volume_thrust = (v20 / v100) if v100 > 0 else np.nan
+
         rsi_w = weekly_rsi(px)
         wk_close, ema21w = weekly_ema(px, 21)
         pivot = episodic_pivot(px, vol)
@@ -186,6 +208,10 @@ def compute_metrics(close: pd.DataFrame, volume: pd.DataFrame,
             "proximity": proximity,
             "rs_near_high": rs_near_high,
             "rs_days_since_high": rs_days_since_high,
+            "vol_contraction": vol_contraction,
+            "base_quality": base_quality,
+            "quiet_runup": quiet_runup,
+            "volume_thrust": volume_thrust,
             "sma20": sma20, "sma50": sma50, "sma200": sma200,
             "atr20": atr20, "ext20": ext20, "ext50": ext50, "ext_atr": ext_atr,
             "weekly_rsi": rsi_w, "weekly_close": wk_close, "ema21w": ema21w,
@@ -425,33 +451,69 @@ def sector_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def composite(df: pd.DataFrame, sectors: pd.DataFrame) -> pd.DataFrame:
-    """Blend everything into a single ranked score."""
+    """Rank on the likelihood of a move ahead, not the size of the one behind.
+
+    Four blocks. Trend asks whether the stock is moving at all. Emergence asks
+    whether it has been coiling rather than running — this carries the most
+    weight, because a name that has already tripled has spent its potential.
+    Fundamentals asks whether the business underneath is accelerating. Value
+    asks whether there is room in the multiple for a rerating, since a 3x from
+    12x earnings needs far less than a 3x from 60x.
+    """
     df = df.copy()
     pool = df[df["eligible"]].copy()
     if pool.empty:
-        df["composite"] = np.nan
-        df["rank"] = np.nan
+        for c in ("composite", "rank", "emergence_score"):
+            df[c] = np.nan
         return df
 
-    mom = _z(pool["risk_adj_mom"])
-    qual = (config.W_CONSISTENCY * _z(pool["consistency"])
-            + config.W_ACCELERATION * _z(pool["acceleration"])
-            + config.W_PROXIMITY * _z(pool["proximity"])
-            + config.W_REL_STRENGTH * _z(pool["rs_near_high"]))
+    # --- trend: moving, and moving smoothly
+    # Consistency weighted equally with magnitude. Rewarding magnitude too
+    # heavily is what drags the ranking back towards names that have already
+    # made their move — the exact thing this design is trying to avoid.
+    trend = 0.50 * _z(pool["risk_adj_mom"]) + 0.50 * _z(pool["consistency"])
 
-    score = config.W_MOMENTUM_BLOCK * mom + config.W_QUALITY_BLOCK * qual
+    # --- emergence: coiled rather than spent
+    emergence = (
+        config.W_VOL_CONTRACTION * _z(-pool["vol_contraction"].fillna(1.0))
+        + config.W_BASE * _z(pool["base_quality"])
+        + config.W_QUIET_RUNUP * (_z(pool["quiet_runup"]) + _z(-pool["r12m"].fillna(0)))
+        + config.W_VOLUME_THRUST * _z(pool["volume_thrust"].fillna(1.0))
+    )
 
-    top3 = set(sectors[sectors["rank"] <= 3].index)
+    # --- fundamentals: acceleration first, level second
+    accel = pool["eps_accel"] if "eps_accel" in pool else pd.Series(np.nan, index=pool.index)
+    fundamentals = (
+        config.W_EARNINGS_ACCEL * _z(accel.fillna(accel.median() if accel.notna().any() else 0))
+        + config.W_EARNINGS_LEVEL * _z(pool["earnings_growth"].fillna(0))
+        + config.W_SALES_LEVEL * _z(pool["revenue_growth"].fillna(0))
+    )
+
+    # --- value: cheaper is better, but only where the multiple is meaningful
+    pe = pool["pe"].where((pool["pe"] > 3) & (pool["pe"] < 120))
+    value = _z(-pe.fillna(pe.median() if pe.notna().any() else 0))
+
+    score = (config.W_TREND * trend
+             + config.W_EMERGENCE * emergence
+             + config.W_FUNDAMENTALS * fundamentals
+             + config.W_VALUE * value)
+
+    # Smaller companies inside the band get a nudge — multibaggers are far
+    # more common at the bottom of a cap range than the top.
+    cap = np.log(pool["market_cap_cr"].clip(lower=1))
+    score = score + config.W_SMALLCAP_TILT * _z(-cap)
+
+    # Sector strength and catalysts sit on top rather than inside, so a real
+    # trigger can lift a name several ranks on its own.
     strong = set(sectors[(sectors["rank"] <= 3)
                          & (sectors["breadth"] >= config.SECTOR_BONUS_BREADTH)].index)
+    top3 = set(sectors[sectors["rank"] <= 3].index)
     bonus = pool["sector"].map(lambda s: config.SECTOR_BONUS if s in strong else 0.0)
-    # Catalysts and sunrise themes are added on top of the momentum score
-    # rather than mixed into it, so a genuine trigger can lift a name several
-    # ranks without a merely volatile chart doing the same.
     cat = pool["catalyst_bonus"] if "catalyst_bonus" in pool else 0.0
     score = score + bonus + cat
 
     pool["composite"] = score
+    pool["emergence_score"] = (_z(emergence).rank(pct=True) * 100).round(0)
     pool["sector_bonus"] = bonus
     pool["sector_top3"] = pool["sector"].isin(top3)
 
@@ -461,7 +523,8 @@ def composite(df: pd.DataFrame, sectors: pd.DataFrame) -> pd.DataFrame:
     pool = pool.sort_values("composite", ascending=False)
     pool["rank"] = range(1, len(pool) + 1)
 
-    for col in ["composite", "rank", "sector_bonus", "sector_top3", "g_sector"]:
+    for col in ["composite", "rank", "emergence_score", "sector_bonus",
+                "sector_top3", "g_sector"]:
         df[col] = pool[col]
     df["g_sector"] = df["g_sector"].fillna(False)
     return df
