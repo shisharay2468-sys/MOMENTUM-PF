@@ -246,7 +246,8 @@ def apply_gates(df: pd.DataFrame) -> pd.DataFrame:
     # Entry-only conditions. A name must clear these to be BOUGHT; a name
     # already held is judged by the exit rules instead, so a winner that
     # runs away from its 20-day average is not thrown out for succeeding.
-    df["e_rsi"] = df["weekly_rsi"].fillna(0) >= config.WEEKLY_RSI_MIN
+    df["e_rsi"] = ((df["weekly_rsi"].fillna(0) >= config.WEEKLY_RSI_MIN)
+                   & (df["weekly_rsi"].fillna(999) <= config.WEEKLY_RSI_MAX))
     df["e_ext20"] = df["ext20"].fillna(9) <= config.MAX_EXT_20DMA
     df["e_ext50"] = df["ext50"].fillna(9) <= config.MAX_EXT_50DMA
     df["e_ext_atr"] = df["ext_atr"].fillna(99) <= config.MAX_EXT_ATR
@@ -298,6 +299,89 @@ def catalyst_scores(df: pd.DataFrame, tagged: dict, themes: dict) -> pd.DataFram
     df["catalyst_bonus"] = bonus
     df["catalyst_note"] = notes
     return df
+
+
+def sub_scores(df: pd.DataFrame, sectors: pd.DataFrame) -> pd.DataFrame:
+    """Three readable 0-100 scores that sit alongside the composite.
+
+    They are percentile ranks within the eligible pool, so 70 means the name
+    beats 70% of its peers on that measure. They explain the composite rather
+    than feed it — the composite is already built from the raw inputs.
+    """
+    df = df.copy()
+    pool = df[df["eligible"]] if df["eligible"].any() else df
+
+    def pctile(col: pd.Series) -> pd.Series:
+        v = col.reindex(pool.index).astype(float)
+        if v.notna().sum() < 3:
+            return pd.Series(np.nan, index=pool.index)
+        return v.rank(pct=True, na_option="keep") * 100
+
+    # Sector score: where this name's sector sits in the sector ranking.
+    n_sec = max(len(sectors), 1)
+    rank_map = sectors["rank"].to_dict()
+    sector_score = pool["sector"].map(
+        lambda s: (100 * (n_sec - rank_map[s] + 1) / n_sec) if s in rank_map else np.nan)
+
+    # Earnings score: profit growth and return on equity together.
+    earn = pd.concat([pctile(pool["earnings_growth"]), pctile(pool["roe"])],
+                     axis=1).mean(axis=1, skipna=True)
+
+    # Growth score: top line, with the momentum of the business itself.
+    growth = pd.concat([pctile(pool["revenue_growth"]), pctile(pool["r6m"])],
+                       axis=1).mean(axis=1, skipna=True)
+
+    for name, series in (("sector_score", sector_score),
+                         ("earnings_score", earn),
+                         ("growth_score", growth)):
+        df[name] = series.round(0)
+    return df
+
+
+def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
+                 meta: pd.DataFrame) -> list[dict]:
+    """Mainboard listings from the last six months holding above the high of
+    their first week of trading.
+
+    These never reach the main screen — a 12-month lookback does not exist —
+    so they are surfaced as their own list to watch, not to buy blind.
+    """
+    out = []
+    for t in close.columns:
+        px = close[t].dropna()
+        if not (config.IPO_MIN_DAYS <= len(px) <= config.IPO_MAX_AGE_DAYS):
+            continue
+        m = meta.loc[t] if t in meta.index else {}
+        mcap = float(m.get("market_cap_cr") or 0)
+        if not (config.MIN_MARKET_CAP_CR <= mcap <= config.MAX_MARKET_CAP_CR):
+            continue
+
+        first_week = px.head(config.IPO_FIRST_WEEK_SESSIONS)
+        week_high = float(first_week.max())
+        last = float(px.iloc[-1])
+        if week_high <= 0 or last < week_high:
+            continue
+
+        vol = volume[t].reindex(px.index).fillna(0) if t in volume else None
+        adv = float((px.tail(20) * vol.tail(20)).mean() / 1e7) if vol is not None else 0.0
+        if adv < config.MIN_ADV_CR:
+            continue
+
+        out.append({
+            "symbol": t.replace(".NS", ""),
+            "name": str(m.get("name", t.replace(".NS", "")))[:38],
+            "sector": m.get("sector", "Unclassified"),
+            "price": last,
+            "listed_date": px.index[0].strftime("%d %b %Y"),
+            "sessions": len(px),
+            "week_high": week_high,
+            "above_week_high": last / week_high - 1,
+            "since_listing": last / float(px.iloc[0]) - 1,
+            "market_cap_cr": mcap,
+            "adv_cr": adv,
+        })
+    out.sort(key=lambda x: x["above_week_high"], reverse=True)
+    return out
 
 
 def sector_table(df: pd.DataFrame) -> pd.DataFrame:
