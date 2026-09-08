@@ -116,7 +116,7 @@ META_CACHE_DAYS = 7             # re-pull sector / fundamentals weekly
 # invite rate limiting. Instead each run pulls a slice and caches it. The
 # system converges over the first three or four runs rather than failing on
 # the first, and every run in between still produces a usable dashboard.
-META_MAX_PER_RUN = 600
+META_MAX_PER_RUN = 3000
 META_PAUSE_EVERY = 50           # short pause after this many, to stay polite
 META_PAUSE_SECONDS = 1.5
 FETCH_RETRIES = 3
