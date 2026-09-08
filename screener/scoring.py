@@ -375,11 +375,12 @@ def sub_scores(df: pd.DataFrame, sectors: pd.DataFrame) -> pd.DataFrame:
 
 def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
                  meta: pd.DataFrame, rs_bench: pd.Series | None = None) -> list[dict]:
-    """Mainboard listings from the last six months holding above the high of
-    their first week of trading.
+    """First pass: mainboard listings under six months old, inside the cap
+    band, holding above the high of their first week.
 
-    These never reach the main screen — a 12-month lookback does not exist —
-    so they are surfaced as their own list to watch, not to buy blind.
+    Only the price and size tests happen here. The fundamental tests need
+    extra data that is only worth fetching for names that get this far, so
+    they run in filter_new_listings once that data is in hand.
     """
     out = []
     for t in close.columns:
@@ -388,19 +389,15 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
             continue
         m = meta.loc[t] if t in meta.index else {}
         mcap = float(m.get("market_cap_cr") or 0)
-        if not (config.MIN_MARKET_CAP_CR <= mcap <= config.MAX_MARKET_CAP_CR):
+        if not (config.IPO_MIN_MARKET_CAP_CR <= mcap <= config.IPO_MAX_MARKET_CAP_CR):
             continue
 
-        first_week = px.head(config.IPO_FIRST_WEEK_SESSIONS)
-        week_high = float(first_week.max())
+        week_high = float(px.head(config.IPO_FIRST_WEEK_SESSIONS).max())
         last = float(px.iloc[-1])
         if week_high <= 0:
             continue
-
         above_high = last >= week_high
 
-        # Second, looser test: simply beating the mid-and-smallcap market
-        # over the past week.
         week_rs = None
         n = config.IPO_WEEK_RS_SESSIONS
         if rs_bench is not None and len(rs_bench) and len(px) > n:
@@ -411,7 +408,10 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
                 bench_wk = float(b.loc[common].iloc[-1] / b.loc[common].iloc[-1 - n] - 1)
                 week_rs = stock_wk - bench_wk
 
-        if not above_high and not (week_rs is not None and week_rs > 0):
+        if config.IPO_REQUIRE_WEEK_HIGH and not above_high:
+            continue
+        if not config.IPO_REQUIRE_WEEK_HIGH and not above_high and not (
+                week_rs is not None and week_rs > 0):
             continue
 
         vol = volume[t].reindex(px.index).fillna(0) if t in volume else None
@@ -420,6 +420,7 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
             continue
 
         out.append({
+            "ticker": t,
             "symbol": t.replace(".NS", ""),
             "name": str(m.get("name", t.replace(".NS", "")))[:38],
             "sector": m.get("sector", "Unclassified"),
@@ -433,7 +434,50 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
             "since_listing": last / float(px.iloc[0]) - 1,
             "market_cap_cr": mcap,
             "adv_cr": adv,
+            "roe": (float(m["roe"]) if pd.notna(m.get("roe")) else None),
+            "sales_growth": (float(m["revenue_growth"])
+                             if pd.notna(m.get("revenue_growth")) else None),
+            "eps_growth": (float(m["earnings_growth"])
+                           if pd.notna(m.get("earnings_growth")) else None),
         })
+    return out
+
+
+def filter_new_listings(cands: list[dict], sectors: pd.DataFrame,
+                        roce: dict, quarterly: dict) -> list[dict]:
+    """Second pass: the quality and growth tests.
+
+    A missing figure counts as a fail. For a company with six months of
+    listed history and no published numbers, silence is not a reason to
+    give it the benefit of the doubt.
+    """
+    strong_sectors = set(sectors[sectors["rank"] <= config.IPO_TOP_SECTORS].index)
+    out = []
+    for c in cands:
+        t = c["ticker"]
+        c["roce"] = roce.get(t)
+        q = quarterly.get(t, {})
+        c["eps_qoq"] = q.get("eps_qoq")
+        c["sales_qoq"] = q.get("sales_qoq")
+        c["eps_yoy_q"] = q.get("eps_yoy_q")
+        c["quarter"] = q.get("quarter")
+
+        reasons = []
+        if (c["roe"] or -1) < config.IPO_MIN_ROE:
+            reasons.append("return on equity")
+        if c["roce"] is None or c["roce"] < config.IPO_MIN_ROCE:
+            reasons.append("return on capital")
+        if (c["sales_growth"] or -1) < config.IPO_MIN_SALES_GROWTH:
+            reasons.append("sales growth")
+        if config.IPO_REQUIRE_EPS_GROWTH and (c["eps_growth"] or -1) <= 0:
+            reasons.append("profit growth")
+        if c["sector"] not in strong_sectors:
+            reasons.append("sector strength")
+
+        if reasons:
+            continue
+        out.append(c)
+
     out.sort(key=lambda x: x["above_week_high"], reverse=True)
     return out
 
