@@ -88,8 +88,19 @@ IPO_FIRST_WEEK_SESSIONS = 5
 # or simply outperforming the mid-and-smallcap market over the past week.
 # The second is deliberately loose — these names are a watchlist, not a book,
 # and the momentum rules that govern the main screen do not apply to them.
-IPO_WEEK_RS_SESSIONS = 5
+IPO_WEEK_RS_SESSIONS = 5        # window for the market-relative reading
 IPO_REQUIRE_LIQUIDITY = False
+
+# A new listing must clear ALL of the following. The price test is the
+# gatekeeper; the rest ask whether there is a business worth owning behind it.
+IPO_REQUIRE_WEEK_HIGH = True    # must hold above its first-week high
+IPO_MIN_MARKET_CAP_CR = 1000.0
+IPO_MAX_MARKET_CAP_CR = 50000.0
+IPO_MIN_ROE = 0.15              # return on equity
+IPO_MIN_ROCE = 0.15             # return on capital employed, where computable
+IPO_MIN_SALES_GROWTH = 0.15
+IPO_REQUIRE_EPS_GROWTH = True   # profit growth must be positive
+IPO_TOP_SECTORS = 10            # sector must rank this high for strength
 
 # ------------------------------------------------------------- catalysts
 # A catalyst is the highest-priority input. Two sources feed it:
