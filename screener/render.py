@@ -183,9 +183,10 @@ function rowHTML(x,i,o){
       +F.spct(x.sales_qoq)+'</b>'+(x.quarter?' \u00b7 quarter to '+esc(x.quarter):'')+'</div>';
   }
   var sc='';
-    if(x.sector_score!=null||x.earnings_score!=null||x.growth_score!=null){
-      sc='<div class="stats">Sector <b>'+F.num(x.sector_score)+'</b> \u00b7 Earnings <b>'
-        +F.num(x.earnings_score)+'</b> \u00b7 Growth <b>'+F.num(x.growth_score)+'</b></div>';
+    if(x.sector_score!=null||x.earnings_score!=null||x.growth_score!=null||x.emergence_score!=null){
+      sc='<div class="stats">Emergence <b>'+F.num(x.emergence_score)+'</b> \u00b7 Sector <b>'
+        +F.num(x.sector_score)+'</b> \u00b7 Earnings <b>'+F.num(x.earnings_score)
+        +'</b> \u00b7 Growth <b>'+F.num(x.growth_score)+'</b></div>';
     }
     stats='<div class="stats">RSI <b>'+F.num(x.weekly_rsi)+'</b> \u00b7 20-day <b>'+F.spct(x.ext20)+'</b>'
       +rs+(o.weight!=null?' \u00b7 weight <b>'+F.pct(o.weight)+'</b>':'')
@@ -207,7 +208,9 @@ function rowHTML(x,i,o){
     +kv(x.quality_score!=null?x.quality_score+' of 5':'--','fundamentals')
     +kv(F.num(x.sector_score),'sector score')
     +kv(F.num(x.earnings_score),'earnings score')
+    +kv(F.num(x.emergence_score),'emergence score')
     +kv(F.num(x.growth_score),'growth score')
+    +(x.eps_accel!=null?kv(F.spct(x.eps_accel),'earnings acceleration'):'')
     +(x.eps_qoq!=null?kv(F.spct(x.eps_qoq),'earnings QoQ'):'')
     +(x.sales_qoq!=null?kv(F.spct(x.sales_qoq),'sales QoQ'):'')
     +(x.stop?kv(F.rs(x.stop),'stop price'):'')
