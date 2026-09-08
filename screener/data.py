@@ -376,6 +376,17 @@ def fetch_quarterly(tickers: list[str]) -> dict:
                         base = float(vals[4])
                         rec[f"{label}_yoy_q"] = float(vals[0]) / abs(base) - (
                             1 if base > 0 else -1)
+                    # The previous quarter's own year-on-year rate, so the
+                    # change in growth rate can be measured. A business whose
+                    # growth is speeding up is worth far more than one growing
+                    # fast but decelerating.
+                    if len(vals) >= 6 and float(vals[5]):
+                        prev_base = float(vals[5])
+                        prev_yoy = float(vals[1]) / abs(prev_base) - (
+                            1 if prev_base > 0 else -1)
+                        rec[f"{label}_prev_yoy"] = prev_yoy
+                        if f"{label}_yoy_q" in rec:
+                            rec[f"{label}_accel"] = rec[f"{label}_yoy_q"] - prev_yoy
                 if rev is not None and len(rev):
                     rec["quarter"] = pd.Timestamp(rev.index[0]).strftime("%b %Y")
         except Exception:  # noqa: BLE001
