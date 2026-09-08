@@ -295,9 +295,13 @@ function boot(){
       +'<div class="sym">'+esc(o.symbol)+'</div>'
       +'<div class="sub">'+esc(o.sector)+' \u00b7 listed '+esc(o.listed_date)+'</div>'
       +'<div class="stats">first-week high <b>'+F.rs(o.week_high)+'</b> \u00b7 now <b>'
-      +F.rs(o.price)+'</b> \u00b7 '+F.cr(o.market_cap_cr)+'</div></div>'
-      +'<div class="rt"><div class="big up">'+F.spct(o.above_week_high,1)+'</div>'
-      +'<div class="sub">above first week</div></div></button>');
+      +F.rs(o.price)+'</b> \u00b7 '+F.cr(o.market_cap_cr)
+      +(o.week_rs!=null?' \u00b7 1-week vs market <b>'+F.spct(o.week_rs,1)+'</b>':'')
+      +'</div><div class="stats">'+(o.holds_week_high?'Holding above its first-week high'
+        :'Below its first-week high, but outpacing the market this week')+'</div></div>'
+      +'<div class="rt"><div class="big '+(o.above_week_high>=0?'up':'down')+'">'
+      +F.spct(o.above_week_high,1)+'</div>'
+      +'<div class="sub">vs first week</div></div></button>');
   }
   document.getElementById('ipoList').innerHTML=ip.length?ip.join(''):
     '<div class="empty">No recent listings are holding above their first-week high.</div>';
