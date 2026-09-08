@@ -63,6 +63,7 @@ WEEKLY_RSI_MAX = 80.0           # above this the move is overheated, not strong
 MAX_EXT_20DMA = 0.12            # price no more than 12% above its 20-day avg
 MAX_EXT_50DMA = 0.25            # and no more than 25% above its 50-day avg
 MAX_EXT_ATR = 4.0              # and no more than 4 ATRs above the 20-day avg
+USE_ATR_EXTENSION = False      # the two percentage caps above are enough
 
 # Hard ceiling on how far a name has already run. A stock up more than this
 # over the last year has had its move; buying it now is buying the tail of a
@@ -73,7 +74,7 @@ MAX_1Y_RETURN = 1.50
 # have made a fresh high recently — a stock can be rising and still be losing
 # to its own peer group, and that is exactly what you do not want to own.
 RS_HIGH_LOOKBACK = 50           # sessions the RS line must have topped
-RS_HIGH_RECENT_DAYS = 15        # and it must have done so this recently
+RS_HIGH_RECENT_DAYS = 30        # and it must have done so this recently
 
 # ----------------------------------------------------------- new listings
 # Recent IPOs cannot pass the main screen — they have no 12-month history —
@@ -111,8 +112,21 @@ PIVOT_MUST_HOLD = 0.92         # still holding 92% of the pivot day close
 MAX_DIST_FROM_52W_HIGH = 0.25   # must trade within 25% of the 52-week high
 SMA200_SLOPE_LOOKBACK = 20      # 200-DMA must be higher than N sessions ago
 
+# Trend gates that can be switched off. Price above both moving averages is
+# always required; these two extra confirmations are optional. Turning them
+# off admits names whose long average has not yet turned up — earlier in a
+# turnaround, and correspondingly less confirmed.
+REQUIRE_GOLDEN_CROSS = False    # 50-day average above the 200-day
+REQUIRE_SMA200_RISING = False   # 200-day average rising
+
+# Fundamental checks. Each name must pass QUALITY_MIN_PASSES of those enabled.
+USE_CASHFLOW_CHECK = False      # operating cash flow against reported profit
+# Dropping a check without lowering this would TIGHTEN the screen: three of
+# four is a higher bar than three of five. Two of four keeps the intent.
+QUALITY_MIN_PASSES = 2
+
 # ------------------------------------------------------------------ sector
-TOP_SECTORS = 8                 # only pick from the N strongest sectors
+TOP_SECTORS = 10                # only pick from the N strongest sectors
 MAX_PER_SECTOR = 4
 SECTOR_BONUS = 0.5              # z-score bonus for a top-3 sector with breadth
 SECTOR_BONUS_BREADTH = 0.70     # share of sector above its 200-DMA
