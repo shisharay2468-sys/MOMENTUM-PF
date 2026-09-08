@@ -300,8 +300,12 @@ function boot(){
       +'<div class="stats">first-week high <b>'+F.rs(o.week_high)+'</b> \u00b7 now <b>'
       +F.rs(o.price)+'</b> \u00b7 '+F.cr(o.market_cap_cr)
       +(o.week_rs!=null?' \u00b7 1-week vs market <b>'+F.spct(o.week_rs,1)+'</b>':'')
-      +'</div><div class="stats">'+(o.holds_week_high?'Holding above its first-week high'
-        :'Below its first-week high, but outpacing the market this week')+'</div></div>'
+      +'</div><div class="stats">ROE <b>'+F.pct(o.roe,0)+'</b> \u00b7 ROCE <b>'
+      +F.pct(o.roce,0)+'</b> \u00b7 sales <b>'+F.spct(o.sales_growth)
+      +'</b> \u00b7 profit <b>'+F.spct(o.eps_growth)+'</b></div>'
+      +(o.eps_qoq!=null?'<div class="stats">QoQ profit <b>'+F.spct(o.eps_qoq)
+        +'</b> \u00b7 sales <b>'+F.spct(o.sales_qoq)+'</b>'
+        +(o.quarter?' \u00b7 quarter to '+esc(o.quarter):'')+'</div>':'')+'</div>'
       +'<div class="rt"><div class="big '+(o.above_week_high>=0?'up':'down')+'">'
       +F.spct(o.above_week_high,1)+'</div>'
       +'<div class="sub">vs first week</div></div></button>');
@@ -385,7 +389,7 @@ TEMPLATE = """<!doctype html>
 </div>
 
 <div class="panel" id="p-ipo">
-  <p class="lede">Mainboard listings from the last six months still trading above the high of their first week. Too young for the momentum screen &mdash; watch these, do not buy them blind.</p>
+  <p class="lede">Mainboard listings under six months old, ₹1,000&ndash;50,000 cr, trading above their first-week high, with return on equity and capital above 15%, sales growth above 15%, positive profit growth, and a sector in the top 10. Too young for the momentum screen &mdash; watch these, do not buy them blind.</p>
   <div id="ipoList"></div>
 </div>
 
