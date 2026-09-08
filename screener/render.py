@@ -177,22 +177,45 @@ function rowHTML(x,i,o){
   if(x.weekly_rsi!=null||x.ext20!=null||x.price||x.rs_days!=null){
     var rs=(x.rs_days==null||x.rs_days>900)?'':(' \u00b7 RS high <b>'
       +(x.rs_days===0?'today':x.rs_days+'d ago')+'</b>');
+    var qq='';
+  if(x.eps_qoq!=null||x.sales_qoq!=null){
+    qq='<div class="stats">QoQ earnings <b>'+F.spct(x.eps_qoq)+'</b> \u00b7 sales <b>'
+      +F.spct(x.sales_qoq)+'</b>'+(x.quarter?' \u00b7 quarter to '+esc(x.quarter):'')+'</div>';
+  }
+  var sc='';
+    if(x.sector_score!=null||x.earnings_score!=null||x.growth_score!=null){
+      sc='<div class="stats">Sector <b>'+F.num(x.sector_score)+'</b> \u00b7 Earnings <b>'
+        +F.num(x.earnings_score)+'</b> \u00b7 Growth <b>'+F.num(x.growth_score)+'</b></div>';
+    }
     stats='<div class="stats">RSI <b>'+F.num(x.weekly_rsi)+'</b> \u00b7 20-day <b>'+F.spct(x.ext20)+'</b>'
       +rs+(o.weight!=null?' \u00b7 weight <b>'+F.pct(o.weight)+'</b>':'')
       +(x.price?' \u00b7 <b>'+F.rs(x.price)+'</b>':'')+'</div>';
   }
-  var ret=(x.r12m!=null)?'<div class="big '+dirOf(x.r12m)+'">'+F.spct(x.r12m)+'</div><div class="sub">1 year</div>':'';
+  var ret='';
+  if(x.eps_growth!==undefined||x.sales_growth!==undefined){
+    ret='<div class="big '+dirOf(x.eps_growth)+'">'+F.spct(x.eps_growth)+'</div>'
+       +'<div class="sub">earnings YoY</div>'
+       +'<div class="big '+dirOf(x.sales_growth)+'" style="margin-top:6px">'+F.spct(x.sales_growth)+'</div>'
+       +'<div class="sub">sales YoY</div>';
+  }else if(x.r12m!=null){
+    ret='<div class="big '+dirOf(x.r12m)+'">'+F.spct(x.r12m)+'</div><div class="sub">1 year</div>';
+  }
   var det='<div class="grid">'
-    +kv(F.spct(x.r6m),'6 months')+kv(F.spct(x.r3m),'3 months')
+    +kv(F.spct(x.r12m),'1 year')+kv(F.spct(x.r6m),'6 months')+kv(F.spct(x.r3m),'3 months')
     +kv(F.pct(x.ann_vol,0),'volatility')+kv(F.num(x.composite,2),'score')
     +kv(F.cr(x.market_cap_cr),'market cap')
     +kv(x.quality_score!=null?x.quality_score+' of 5':'--','fundamentals')
+    +kv(F.num(x.sector_score),'sector score')
+    +kv(F.num(x.earnings_score),'earnings score')
+    +kv(F.num(x.growth_score),'growth score')
+    +(x.eps_qoq!=null?kv(F.spct(x.eps_qoq),'earnings QoQ'):'')
+    +(x.sales_qoq!=null?kv(F.spct(x.sales_qoq),'sales QoQ'):'')
     +(x.stop?kv(F.rs(x.stop),'stop price'):'')
     +(x.blocked?kv(esc(x.blocked),'blocked by'):'')+'</div>';
   return '<button class="row" data-i="'+i+'"><div class="rk">'+(x.rank||'')+'</div><div class="bd">'
     +'<div class="sym">'+esc(x.symbol)+'</div>'
     +'<div class="sub">'+esc(x.sector||'')+(x.name?' \u00b7 '+esc(x.name):'')+'</div>'
-    +stats+cat+spine+'</div><div class="rt">'+ret+tag+'</div></button>'
+    +stats+sc+qq+cat+spine+'</div><div class="rt">'+ret+tag+'</div></button>'
     +'<div class="detail" data-i="'+i+'">'+det+'</div>';
 }
 
@@ -265,6 +288,19 @@ function boot(){
       +'<span class="pct">'+(sec.breadth*100).toFixed(0)+'%</span></div>');
   }
   document.getElementById('sectList').innerHTML=sh.join('');
+  var ip=[];
+  for(var q=0;q<DATA.ipos.length;q++){
+    var o=DATA.ipos[q];
+    ip.push('<button class="row"><div class="rk">'+(q+1)+'</div><div class="bd">'
+      +'<div class="sym">'+esc(o.symbol)+'</div>'
+      +'<div class="sub">'+esc(o.sector)+' \u00b7 listed '+esc(o.listed_date)+'</div>'
+      +'<div class="stats">first-week high <b>'+F.rs(o.week_high)+'</b> \u00b7 now <b>'
+      +F.rs(o.price)+'</b> \u00b7 '+F.cr(o.market_cap_cr)+'</div></div>'
+      +'<div class="rt"><div class="big up">'+F.spct(o.above_week_high,1)+'</div>'
+      +'<div class="sub">above first week</div></div></button>');
+  }
+  document.getElementById('ipoList').innerHTML=ip.length?ip.join(''):
+    '<div class="empty">No recent listings are holding above their first-week high.</div>';
   candidates();
 }
 if(document.readyState==='loading'){
@@ -305,6 +341,7 @@ TEMPLATE = """<!doctype html>
   <button class="tab" role="tab" aria-selected="false" data-panel="p-signal">New signals<span class="pill">__NSIG__</span></button>
   <button class="tab" role="tab" aria-selected="false" data-panel="p-book">The book<span class="pill">__NBOOK__</span></button>
   <button class="tab" role="tab" aria-selected="false" data-panel="p-cand">Candidates<span class="pill">__NCAND__</span></button>
+  <button class="tab" role="tab" aria-selected="false" data-panel="p-ipo">New listings<span class="pill">__NIPO__</span></button>
   <button class="tab" role="tab" aria-selected="false" data-panel="p-sect">Sectors</button>
 </div>
 
@@ -340,6 +377,11 @@ TEMPLATE = """<!doctype html>
   <div id="candList"></div>
 </div>
 
+<div class="panel" id="p-ipo">
+  <p class="lede">Mainboard listings from the last six months still trading above the high of their first week. Too young for the momentum screen &mdash; watch these, do not buy them blind.</p>
+  <div id="ipoList"></div>
+</div>
+
 <div class="panel" id="p-sect">
   <p class="lede">Ranked by six-month median return and breadth. Only the top __TOPSECT__ are eligible; the bar shows the share of the sector above its 200-day average.</p>
   <div id="sectList"></div>
@@ -364,6 +406,7 @@ def render(payload: dict, out_path: str) -> str:
     # The exit list is what the alerts already are; give it its own key so the
     # front end never has to know they were called alerts.
     payload = dict(payload)
+    payload.setdefault("ipos", [])
     payload["exits"] = [
         {"symbol": a["symbol"], "sector": a["kind"], "name": a["detail"],
          "rank": "", "r12m": None, "catalyst": ""}
@@ -403,12 +446,17 @@ def render(payload: dict, out_path: str) -> str:
         "__NSIG__": str(len(payload.get("new_signals", []))),
         "__NBOOK__": str(len(payload["book"])),
         "__NCAND__": str(len(payload.get("candidates", []))),
+        "__NIPO__": str(len(payload.get("ipos", []))),
         "__TOPSECT__": str(payload["top_sectors"]),
         "__NEXTREB__": payload["next_rebalance"],
     }.items():
         html = html.replace(k, v)
 
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    out_dir = os.path.dirname(out_path)
+    os.makedirs(out_dir, exist_ok=True)
+    # Tells GitHub Pages to serve these files as-is instead of running them
+    # through Jekyll, which chokes on a plain HTML page.
+    open(os.path.join(out_dir, ".nojekyll"), "a").close()
     with open(out_path, "w") as fh:
         fh.write(html)
     with open(os.path.join(os.path.dirname(out_path), "data.json"), "w") as fh:
