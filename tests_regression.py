@@ -26,8 +26,8 @@ g = scoring.apply_gates(m)
 check("mcap band enforced",
       bool(((g[g.g_mcap].market_cap_cr >= config.MIN_MARKET_CAP_CR) &
             (g[g.g_mcap].market_cap_cr <= config.MAX_MARKET_CAP_CR)).all()))
-check("RS gate at 15 days",
-      bool((g[g.e_rs_high].rs_days_since_high <= 15).all()),
+check(f"RS gate at {config.RS_HIGH_RECENT_DAYS} days",
+      bool((g[g.e_rs_high].rs_days_since_high <= config.RS_HIGH_RECENT_DAYS).all()),
       f"{int(g.e_rs_high.sum())} pass")
 check("entry_ok implies eligible", bool((~g.entry_ok | g.eligible).all()))
 check("blocked reasons populated", bool((g[~g.entry_ok & g.eligible].entry_blocked_by != "").all()))
@@ -61,6 +61,30 @@ check("refill capped", len(rf) <= config.MAX_REFILLS_PER_RUN, f"{len(rf)}")
 check("refills pass entry rules", bool(sc.loc[rf, "entry_ok"].all()) if rf else True)
 
 check("empty universe safe", len(portfolio.build_target(sc.head(0), {}, reg, True)) == 0)
+
+# The new-listings screen must be fully walled off from the main screen.
+# Every IPO setting is pushed to an extreme and the main ranking re-computed;
+# any difference means the two have become entangled.
+def _main_ranking():
+    mm = scoring.compute_metrics(close, volume, meta, bench, proxy)
+    mm = scoring.catalyst_scores(mm, {}, {})
+    gg = scoring.apply_gates(mm)
+    ss = scoring.sector_table(gg[gg.g_mcap & gg.g_liquidity])
+    cc = scoring.sub_scores(scoring.composite(gg, ss), ss)
+    pp = cc[cc.eligible & cc.g_sector].sort_values("composite", ascending=False)
+    return list(pp.index), [round(float(x), 6) for x in pp["composite"]]
+
+_names, _scores = _main_ranking()
+_saved = {k: getattr(config, k) for k in dir(config) if k.startswith("IPO_")}
+for _k, _v in [("IPO_MIN_ROE", 0.9), ("IPO_MIN_ROCE", 0.9), ("IPO_MAX_AGE_DAYS", 5),
+               ("IPO_MIN_MARKET_CAP_CR", 40000.0), ("IPO_MAX_MARKET_CAP_CR", 1200.0),
+               ("IPO_TOP_SECTORS", 1), ("IPO_MIN_SALES_GROWTH", 5.0),
+               ("IPO_REQUIRE_WEEK_HIGH", False), ("IPO_REQUIRE_LIQUIDITY", True)]:
+    setattr(config, _k, _v)
+_n2, _s2 = _main_ranking()
+for _k, _v in _saved.items():
+    setattr(config, _k, _v)
+check("IPO settings do not touch the main list", _n2 == _names and _s2 == _scores)
 
 st = data.load_state()
 check("state loads", isinstance(st, dict) and "holdings" in st)
