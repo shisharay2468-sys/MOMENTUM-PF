@@ -1,1 +1,170 @@
-{"holdings":{},"last_rebalance":null,"history":[],"buyable":[]}
+{
+  "holdings": {
+    "AVALON.NS": {
+      "entry_price": 2340.800048828125,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "PARAS.NS": {
+      "entry_price": 1527.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "AETHER.NS": {
+      "entry_price": 1635.300048828125,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "NEULANDLAB.NS": {
+      "entry_price": 23770.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "GLAND.NS": {
+      "entry_price": 2961.10009765625,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "MARKSANS.NS": {
+      "entry_price": 335.95001220703125,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "INDOBORAX.NS": {
+      "entry_price": 511.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "FINCABLES.NS": {
+      "entry_price": 1301.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "MACPOWER.NS": {
+      "entry_price": 1875.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "NAVINFLUOR.NS": {
+      "entry_price": 8687.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "IPCALAB.NS": {
+      "entry_price": 1980.9000244140625,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "RPEL.NS": {
+      "entry_price": 1696.800048828125,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "REDINGTON.NS": {
+      "entry_price": 374.8500061035156,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "HAPPYFORGE.NS": {
+      "entry_price": 2230.699951171875,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "CNL.NS": {
+      "entry_price": 1153.699951171875,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "CONFIPET.NS": {
+      "entry_price": 83.58999633789062,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "IRISDOREME.NS": {
+      "entry_price": 61.52000045776367,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "NILKAMAL.NS": {
+      "entry_price": 2092.0,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "ANANDRATHI.NS": {
+      "entry_price": 2221.199951171875,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    },
+    "KDDL.NS": {
+      "entry_price": 3996.199951171875,
+      "entry_date": "2026-09-08",
+      "weight": 0.0475
+    }
+  },
+  "last_rebalance": "2026-09-08",
+  "history": [
+    {
+      "date": "2026-09-08",
+      "bought": [
+        "AVALON",
+        "PARAS",
+        "AETHER",
+        "NEULANDLAB",
+        "GLAND",
+        "MARKSANS",
+        "INDOBORAX",
+        "FINCABLES",
+        "MACPOWER",
+        "NAVINFLUOR",
+        "IPCALAB",
+        "RPEL",
+        "REDINGTON",
+        "HAPPYFORGE",
+        "CNL",
+        "CONFIPET",
+        "IRISDOREME",
+        "NILKAMAL",
+        "ANANDRATHI",
+        "KDDL"
+      ],
+      "sold": []
+    }
+  ],
+  "buyable": [
+    "AARTIPHARM.NS",
+    "AETHER.NS",
+    "AJANTPHARM.NS",
+    "AKUMS.NS",
+    "ANANDRATHI.NS",
+    "AVALON.NS",
+    "AVTNPL.NS",
+    "BALAMINES.NS",
+    "CASTROLIND.NS",
+    "CNL.NS",
+    "CONFIPET.NS",
+    "DYCL.NS",
+    "FINCABLES.NS",
+    "GHCLTEXTIL.NS",
+    "GLAND.NS",
+    "GNFC.NS",
+    "GUFICBIO.NS",
+    "HAPPYFORGE.NS",
+    "HNDFDS.NS",
+    "INDOBORAX.NS",
+    "IPCALAB.NS",
+    "IRISDOREME.NS",
+    "JGCHEM.NS",
+    "KDDL.NS",
+    "KINGFA.NS",
+    "KMEW.NS",
+    "MACPOWER.NS",
+    "MARKSANS.NS",
+    "NAVINFLUOR.NS",
+    "NEULANDLAB.NS",
+    "NILKAMAL.NS",
+    "PARAS.NS",
+    "PRICOLLTD.NS",
+    "REDINGTON.NS",
+    "RPEL.NS"
+  ]
+}
