@@ -84,9 +84,22 @@ def main(argv=None) -> int:
     investable = gated[gated["g_mcap"] & gated["g_liquidity"]]
     sectors = scoring.sector_table(investable if len(investable) > 20 else gated)
     scored = scoring.composite(gated, sectors)
+    scored = scoring.sub_scores(scored, sectors)
+    ipos = scoring.new_listings(close, volume, meta)
+    if ipos:
+        print(f"  {len(ipos)} recent listings holding above their first-week high")
     eligible_n = int(scored["eligible"].sum())
     entry_n = int(scored["entry_ok"].sum())
     print(f"  {eligible_n} cleared the gates, {entry_n} are buyable today")
+
+    # Quarterly results, only for the names that will appear on the page.
+    shortlist = list(scored[scored["eligible"]].sort_values(
+        "composite", ascending=False).head(config.QUARTERLY_MAX).index)
+    quarterly = {} if args.offline_test else data.fetch_quarterly(shortlist)
+
+    def qtr(t: str, key: str):
+        v = quarterly.get(t, {}).get(key)
+        return float(v) if v is not None else None
 
     state = data.load_state()
     holdings = state.get("holdings", {})
@@ -139,6 +152,14 @@ def main(argv=None) -> int:
             "rs_days": int(r["rs_days_since_high"]) if pd.notna(r.get("rs_days_since_high")) else None,
             "stop": float(holdings.get(t, {}).get("entry_price", r["price"])) * (1 - config.INITIAL_STOP),
             "catalyst": r.get("catalyst_note") or "",
+            "eps_growth": float(r["earnings_growth"]) if pd.notna(r.get("earnings_growth")) else None,
+            "sales_growth": float(r["revenue_growth"]) if pd.notna(r.get("revenue_growth")) else None,
+            "eps_qoq": qtr(t, "eps_qoq"), "sales_qoq": qtr(t, "sales_qoq"),
+            "quarter": quarterly.get(t, {}).get("quarter"),
+            "sector_score": float(r["sector_score"]) if pd.notna(r.get("sector_score")) else None,
+            "earnings_score": float(r["earnings_score"]) if pd.notna(r.get("earnings_score")) else None,
+            "growth_score": float(r["growth_score"]) if pd.notna(r.get("growth_score")) else None,
+
             "weight": float(r["weight"]), "action": r["action"],
             "reason": r.get("reason", ""),
         })
@@ -169,6 +190,10 @@ def main(argv=None) -> int:
          "weekly_rsi": float(r["weekly_rsi"]) if pd.notna(r.get("weekly_rsi")) else None,
          "ext20": float(r["ext20"]) if pd.notna(r.get("ext20")) else None,
          "rs_days": int(r["rs_days_since_high"]) if pd.notna(r.get("rs_days_since_high")) else None,
+         "eps_growth": float(r["earnings_growth"]) if pd.notna(r.get("earnings_growth")) else None,
+         "sales_growth": float(r["revenue_growth"]) if pd.notna(r.get("revenue_growth")) else None,
+         "eps_qoq": qtr(_, "eps_qoq"), "sales_qoq": qtr(_, "sales_qoq"),
+         "quarter": quarterly.get(_, {}).get("quarter"),
          "catalyst": r.get("catalyst_note") or ""}
         for _, r in fresh_rows.head(12).iterrows()
     ]
@@ -205,6 +230,13 @@ def main(argv=None) -> int:
          "buyable": bool(r["entry_ok"]),
          "blocked": r.get("entry_blocked_by", ""),
          "held": t in target.index,
+         "eps_growth": float(r["earnings_growth"]) if pd.notna(r.get("earnings_growth")) else None,
+         "sales_growth": float(r["revenue_growth"]) if pd.notna(r.get("revenue_growth")) else None,
+         "eps_qoq": qtr(t, "eps_qoq"), "sales_qoq": qtr(t, "sales_qoq"),
+         "quarter": quarterly.get(t, {}).get("quarter"),
+         "sector_score": float(r["sector_score"]) if pd.notna(r.get("sector_score")) else None,
+         "earnings_score": float(r["earnings_score"]) if pd.notna(r.get("earnings_score")) else None,
+         "growth_score": float(r["growth_score"]) if pd.notna(r.get("growth_score")) else None,
          "catalyst": r.get("catalyst_note") or ""}
         for t, r in pool.head(60).iterrows()
     ]
@@ -223,6 +255,7 @@ def main(argv=None) -> int:
         "sectors": sect_rows,
         "watchlist": watch,
         "candidates": candidates,
+        "ipos": ipos,
         "top_sectors": config.TOP_SECTORS,
         "watch_from": (watch[0]["rank"] if watch else 0),
         "watch_to": (watch[-1]["rank"] if watch else 0),
