@@ -85,7 +85,7 @@ def main(argv=None) -> int:
     sectors = scoring.sector_table(investable if len(investable) > 20 else gated)
     scored = scoring.composite(gated, sectors)
     scored = scoring.sub_scores(scored, sectors)
-    ipos = scoring.new_listings(close, volume, meta)
+    ipos = scoring.new_listings(close, volume, meta, rs_bench)
     if ipos:
         print(f"  {len(ipos)} recent listings holding above their first-week high")
     eligible_n = int(scored["eligible"].sum())
