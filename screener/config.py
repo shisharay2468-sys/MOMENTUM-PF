@@ -36,6 +36,7 @@ W_REL_STRENGTH = 0.20           # RS line vs benchmark near its own high
 # These apply ONLY to new buys. Existing holdings are never forced out for
 # failing them — that is what the exit rules are for.
 WEEKLY_RSI_MIN = 65.0           # 14-period RSI on weekly closes
+WEEKLY_RSI_MAX = 80.0           # above this the move is overheated, not strong
 MAX_EXT_20DMA = 0.12            # price no more than 12% above its 20-day avg
 MAX_EXT_50DMA = 0.25            # and no more than 25% above its 50-day avg
 MAX_EXT_ATR = 4.0              # and no more than 4 ATRs above the 20-day avg
@@ -45,6 +46,15 @@ MAX_EXT_ATR = 4.0              # and no more than 4 ATRs above the 20-day avg
 # to its own peer group, and that is exactly what you do not want to own.
 RS_HIGH_LOOKBACK = 50           # sessions the RS line must have topped
 RS_HIGH_RECENT_DAYS = 15        # and it must have done so this recently
+
+# ----------------------------------------------------------- new listings
+# Recent IPOs cannot pass the main screen — they have no 12-month history —
+# so they are tracked separately. The test is whether the stock holds above
+# the high of its first week of trading, which is the cleanest read on
+# whether the listing found real demand or just a pop.
+IPO_MAX_AGE_DAYS = 180          # listed within the last six months
+IPO_MIN_DAYS = 15               # but with enough trading to judge
+IPO_FIRST_WEEK_SESSIONS = 5
 
 # ------------------------------------------------------------- catalysts
 # A catalyst is the highest-priority input. Two sources feed it:
@@ -116,7 +126,13 @@ META_CACHE_DAYS = 7             # re-pull sector / fundamentals weekly
 # invite rate limiting. Instead each run pulls a slice and caches it. The
 # system converges over the first three or four runs rather than failing on
 # the first, and every run in between still produces a usable dashboard.
-META_MAX_PER_RUN = 3000
+META_MAX_PER_RUN = 600
 META_PAUSE_EVERY = 50           # short pause after this many, to stay polite
 META_PAUSE_SECONDS = 1.5
 FETCH_RETRIES = 3
+
+# Quarterly results are a second request per company, so they are pulled only
+# for the names that actually reach the dashboard rather than the whole
+# market. That keeps the cost to about a hundred requests a run.
+QUARTERLY_MAX = 100
+QUARTERLY_CACHE_DAYS = 7
