@@ -100,9 +100,16 @@ def main(argv=None) -> int:
 
     scored = scoring.composite(gated, sectors)
     scored = scoring.sub_scores(scored, sectors)
-    ipos = scoring.new_listings(close, volume, meta, rs_bench)
-    if ipos:
-        print(f"  {len(ipos)} recent listings holding above their first-week high")
+    ipo_cands = scoring.new_listings(close, volume, meta, rs_bench)
+    if ipo_cands:
+        ipo_tickers = [c["ticker"] for c in ipo_cands]
+        ipo_roce = {} if args.offline_test else data.fetch_roce(ipo_tickers)
+        ipo_qtr = {} if args.offline_test else data.fetch_quarterly(ipo_tickers)
+        ipos = scoring.filter_new_listings(ipo_cands, sectors, ipo_roce, ipo_qtr)
+        print(f"  {len(ipo_cands)} recent listings above their first-week high, "
+              f"{len(ipos)} clear the quality tests")
+    else:
+        ipos = []
     eligible_n = int(scored["eligible"].sum())
     entry_n = int(scored["entry_ok"].sum())
     print(f"  {eligible_n} cleared the gates, {entry_n} are buyable today")
