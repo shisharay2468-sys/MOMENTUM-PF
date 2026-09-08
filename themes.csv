@@ -1,0 +1,14 @@
+keyword,weight
+electrical equipment,1.0
+heavy electrical,1.0
+power,0.8
+utilities,0.6
+aerospace,1.0
+defense,1.0
+defence,1.0
+railroads,0.7
+electronic components,1.0
+semiconductor,1.0
+engineering & construction,0.7
+specialty chemicals,0.6
+information technology services,0.5
