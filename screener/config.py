@@ -16,6 +16,29 @@ MIN_HISTORY_DAYS = 300          # need a full 12m lookback plus buffer
 EXCLUDE_SME = True
 ALLOWED_SERIES = ("EQ",)        # excludes SM, ST (SME), BE, BZ (trade-to-trade)
 
+# ------------------------------------------------------- composite blocks
+# The objective is a name that is STARTING a move, not one that has finished
+# it. Four blocks, weighted. Must sum to 1.
+W_TREND = 0.22          # is it trending at all, and smoothly
+W_EMERGENCE = 0.38      # has it been coiling rather than running
+W_FUNDAMENTALS = 0.25   # is the business accelerating underneath
+W_VALUE = 0.15          # is there room in the multiple for a rerating
+
+# Inside the emergence block
+W_VOL_CONTRACTION = 0.30   # recent range tight against its own year
+W_BASE = 0.30              # long time spent near the highs without running
+W_QUIET_RUNUP = 0.25       # up modestly, not already extended
+W_VOLUME_THRUST = 0.15     # volume waking up against its own average
+
+# Inside the fundamentals block
+W_EARNINGS_ACCEL = 0.45    # growth rate rising, not merely high
+W_EARNINGS_LEVEL = 0.30
+W_SALES_LEVEL = 0.25
+
+# Small-company tilt. Multibaggers are far more common at the bottom of the
+# cap range, so within your band, smaller gets a nudge.
+W_SMALLCAP_TILT = 0.35
+
 # ------------------------------------------------------------ momentum mix
 # Weights inside the raw return blend. Must sum to 1.
 W_R12_1 = 0.40                  # 12-month return, skipping the most recent month
