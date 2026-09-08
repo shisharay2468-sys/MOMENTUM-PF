@@ -251,16 +251,21 @@ def apply_gates(df: pd.DataFrame) -> pd.DataFrame:
     df["e_ext20"] = df["ext20"].fillna(9) <= config.MAX_EXT_20DMA
     df["e_ext50"] = df["ext50"].fillna(9) <= config.MAX_EXT_50DMA
     df["e_ext_atr"] = df["ext_atr"].fillna(99) <= config.MAX_EXT_ATR
+    if config.MAX_1Y_RETURN is not None:
+        df["e_run_up"] = df["r12m"].fillna(0) <= config.MAX_1Y_RETURN
     df["e_rs_high"] = (df["rs_days_since_high"].fillna(9999)
                        <= config.RS_HIGH_RECENT_DAYS)
     entry_cols = [c for c in df.columns if c.startswith("e_")]
     df["entry_ok"] = df[entry_cols].all(axis=1) & df["eligible"]
     df["entry_blocked_by"] = df[entry_cols].apply(
-        lambda r: ", ".join({"e_rsi": "weekly RSI below 65",
+        lambda r: ", ".join({"e_rsi": f"weekly RSI outside "
+                                      f"{config.WEEKLY_RSI_MIN:.0f}-{config.WEEKLY_RSI_MAX:.0f}",
                              "e_ext20": "extended from the 20-day",
                              "e_ext50": "extended from the 50-day",
                              "e_ext_atr": "extended in ATR terms",
-                             "e_rs_high": "no fresh 50-day relative strength high"}[c]
+                             "e_rs_high": "no fresh 50-day relative strength high",
+                             "e_run_up": f"already up more than "
+                                         f"{(config.MAX_1Y_RETURN or 0) * 100:.0f}% in a year"}[c]
                             for c in entry_cols if not r[c]), axis=1)
     return df
 
@@ -339,7 +344,7 @@ def sub_scores(df: pd.DataFrame, sectors: pd.DataFrame) -> pd.DataFrame:
 
 
 def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
-                 meta: pd.DataFrame) -> list[dict]:
+                 meta: pd.DataFrame, rs_bench: pd.Series | None = None) -> list[dict]:
     """Mainboard listings from the last six months holding above the high of
     their first week of trading.
 
@@ -359,12 +364,29 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
         first_week = px.head(config.IPO_FIRST_WEEK_SESSIONS)
         week_high = float(first_week.max())
         last = float(px.iloc[-1])
-        if week_high <= 0 or last < week_high:
+        if week_high <= 0:
+            continue
+
+        above_high = last >= week_high
+
+        # Second, looser test: simply beating the mid-and-smallcap market
+        # over the past week.
+        week_rs = None
+        n = config.IPO_WEEK_RS_SESSIONS
+        if rs_bench is not None and len(rs_bench) and len(px) > n:
+            b = rs_bench.reindex(px.index).ffill().dropna()
+            common = px.index.intersection(b.index)
+            if len(common) > n:
+                stock_wk = float(px.loc[common].iloc[-1] / px.loc[common].iloc[-1 - n] - 1)
+                bench_wk = float(b.loc[common].iloc[-1] / b.loc[common].iloc[-1 - n] - 1)
+                week_rs = stock_wk - bench_wk
+
+        if not above_high and not (week_rs is not None and week_rs > 0):
             continue
 
         vol = volume[t].reindex(px.index).fillna(0) if t in volume else None
         adv = float((px.tail(20) * vol.tail(20)).mean() / 1e7) if vol is not None else 0.0
-        if adv < config.MIN_ADV_CR:
+        if config.IPO_REQUIRE_LIQUIDITY and adv < config.MIN_ADV_CR:
             continue
 
         out.append({
@@ -376,6 +398,8 @@ def new_listings(close: pd.DataFrame, volume: pd.DataFrame,
             "sessions": len(px),
             "week_high": week_high,
             "above_week_high": last / week_high - 1,
+            "holds_week_high": bool(above_high),
+            "week_rs": week_rs,
             "since_listing": last / float(px.iloc[0]) - 1,
             "market_cap_cr": mcap,
             "adv_cr": adv,
