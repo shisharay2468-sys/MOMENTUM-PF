@@ -1,0 +1,62 @@
+name: Momentum run
+
+on:
+  schedule:
+    # 12:15 UTC = 17:45 IST, comfortably after the NSE close and after
+    # Yahoo has settled the day's adjusted closes.
+    - cron: "15 12 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      force_rebalance:
+        description: "Force a rebalance regardless of the calendar"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: momentum
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Self-test on synthetic data
+        # Runs the whole pipeline without touching the network. If the code
+        # is broken, this fails in ten seconds instead of an hour in.
+        run: python -m screener.run --offline-test
+
+      - name: Run the screen
+        run: |
+          if [ "${{ inputs.force_rebalance }}" = "true" ]; then
+            python -m screener.run --force-rebalance
+          else
+            python -m screener.run
+          fi
+
+      - name: Commit the day's output
+        run: |
+          git config user.name  "momentum-bot"
+          git config user.email "momentum-bot@users.noreply.github.com"
+          git add docs state universe.csv
+          git diff --staged --quiet || git commit -m "Run $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Upload dashboard artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard
+          path: docs/
+          retention-days: 30
