@@ -41,6 +41,11 @@ MAX_EXT_20DMA = 0.12            # price no more than 12% above its 20-day avg
 MAX_EXT_50DMA = 0.25            # and no more than 25% above its 50-day avg
 MAX_EXT_ATR = 4.0              # and no more than 4 ATRs above the 20-day avg
 
+# Hard ceiling on how far a name has already run. A stock up more than this
+# over the last year has had its move; buying it now is buying the tail of a
+# distribution, not the middle. Set to None to disable.
+MAX_1Y_RETURN = 1.50
+
 # Relative strength against the mid-and-smallcap market. The ratio line must
 # have made a fresh high recently — a stock can be rising and still be losing
 # to its own peer group, and that is exactly what you do not want to own.
@@ -55,6 +60,12 @@ RS_HIGH_RECENT_DAYS = 15        # and it must have done so this recently
 IPO_MAX_AGE_DAYS = 180          # listed within the last six months
 IPO_MIN_DAYS = 15               # but with enough trading to judge
 IPO_FIRST_WEEK_SESSIONS = 5
+# A new listing qualifies on EITHER test: holding above its first-week high,
+# or simply outperforming the mid-and-smallcap market over the past week.
+# The second is deliberately loose — these names are a watchlist, not a book,
+# and the momentum rules that govern the main screen do not apply to them.
+IPO_WEEK_RS_SESSIONS = 5
+IPO_REQUIRE_LIQUIDITY = False
 
 # ------------------------------------------------------------- catalysts
 # A catalyst is the highest-priority input. Two sources feed it:
