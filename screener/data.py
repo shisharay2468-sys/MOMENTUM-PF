@@ -22,6 +22,8 @@ CACHE = os.path.join(STATE, "cache")
 os.makedirs(CACHE, exist_ok=True)
 
 NSE_EQUITY_LIST = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+NSE_EQUITY_LIST_ALT = "https://www1.nseindia.com/content/equities/EQUITY_L.csv"
+NSE_HOME = "https://www.nseindia.com"
 NSE_SME_LIST = "https://nsearchives.nseindia.com/emerge/corporates/content/SME_EQUITY_L.csv"
 _HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
@@ -40,9 +42,27 @@ def load_universe() -> pd.DataFrame:
     fallback = os.path.join(ROOT, "universe.csv")
     df = None
     try:
-        r = requests.get(NSE_EQUITY_LIST, headers=_HEADERS, timeout=30)
-        r.raise_for_status()
-        df = pd.read_csv(io.StringIO(r.text))
+        # NSE requires a session cookie from its home page before it will
+        # serve the archive, and it often blocks cloud IPs outright. Try both
+        # hosts with a real session before giving up.
+        text = None
+        sess = requests.Session()
+        sess.headers.update(_HEADERS)
+        try:
+            sess.get(NSE_HOME, timeout=20)
+        except Exception:  # noqa: BLE001
+            pass
+        for url in (NSE_EQUITY_LIST, NSE_EQUITY_LIST_ALT):
+            try:
+                r = sess.get(url, timeout=30)
+                if r.status_code == 200 and "SYMBOL" in r.text[:400]:
+                    text = r.text
+                    break
+            except Exception:  # noqa: BLE001
+                continue
+        if text is None:
+            raise RuntimeError("NSE did not serve the equity list")
+        df = pd.read_csv(io.StringIO(text))
         df.columns = [c.strip() for c in df.columns]
         df = df[df["SERIES"].str.strip().isin(config.ALLOWED_SERIES)]
         df = pd.DataFrame({
@@ -54,8 +74,28 @@ def load_universe() -> pd.DataFrame:
         print(f"  NSE list unavailable ({exc}); using committed universe.csv")
         if not os.path.exists(fallback):
             raise SystemExit(
-                "No universe available. Download EQUITY_L.csv from NSE and "
-                "save it as universe.csv in the repo root."
+                "\n"
+                "==================================================================\n"
+                " NO STOCK LIST AVAILABLE\n"
+                "==================================================================\n"
+                " NSE would not serve its equity list to this server, and there is\n"
+                " no universe.csv in the repository to fall back on. NSE blocks\n"
+                " cloud servers fairly often, so this is expected rather than a\n"
+                " fault in the code.\n"
+                "\n"
+                " Fix it once and it never recurs:\n"
+                "  1. On your own computer open\n"
+                "     https://www.nseindia.com/market-data/securities-available-for-trading\n"
+                "  2. Download the 'Securities available for Equity segment' CSV\n"
+                "     (the file is called EQUITY_L.csv).\n"
+                "  3. Rename it to universe.csv\n"
+                "  4. On GitHub click Add file, Upload files, and drop it into the\n"
+                "     top level of the repository. Commit.\n"
+                "  5. Re-run the workflow.\n"
+                "\n"
+                " The file needs a SYMBOL column and a SERIES column. Everything\n"
+                " else in it is ignored. Refresh it once a year or so.\n"
+                "==================================================================\n"
             ) from exc
         df = pd.read_csv(fallback)
 
@@ -273,6 +313,79 @@ def fetch_benchmark(period: str = "2y") -> pd.Series:
             continue
     print("  WARNING: no benchmark history. Regime switch will read unknown.")
     return pd.Series(dtype=float)
+
+
+_REV_ROWS = ("Total Revenue", "Operating Revenue", "Revenue")
+_NI_ROWS = ("Net Income", "Net Income Common Stockholders",
+            "Net Income From Continuing Operation Net Minority Interest")
+
+
+def _pick_row(df, names):
+    """Yahoo renames statement rows between companies and over time, so try
+    the known variants rather than assuming one label."""
+    for n in names:
+        if n in df.index:
+            row = df.loc[n].dropna()
+            if len(row):
+                return row
+    return None
+
+
+def fetch_quarterly(tickers: list[str]) -> dict:
+    """Quarter-on-quarter and year-on-year growth from the quarterly results.
+
+    Only called for names that reach the dashboard. Cached for a week, since
+    results do not change daily. Any company Yahoo has no statement for is
+    recorded as empty so it is not retried every run.
+    """
+    import yfinance as yf
+
+    path = _cache_path("quarterly.json")
+    cached: dict = {}
+    if os.path.exists(path):
+        try:
+            with open(path) as fh:
+                cached = json.load(fh)
+        except Exception:  # noqa: BLE001
+            cached = {}
+
+    fresh = _cache_fresh(path, config.QUARTERLY_CACHE_DAYS)
+    todo = [t for t in tickers if t not in cached] if fresh else list(tickers)
+    todo = todo[:config.QUARTERLY_MAX]
+    if todo:
+        print(f"  quarterly results for {len(todo)} names")
+
+    for n, t in enumerate(todo, 1):
+        rec = {}
+        try:
+            q = yf.Ticker(t).quarterly_income_stmt
+            if q is not None and not q.empty:
+                # Columns are quarter-end dates; newest first.
+                q = q.reindex(sorted(q.columns, reverse=True), axis=1)
+                rev = _pick_row(q, _REV_ROWS)
+                ni = _pick_row(q, _NI_ROWS)
+                for label, row in (("sales", rev), ("eps", ni)):
+                    if row is None or len(row) < 2:
+                        continue
+                    vals = list(row.values)
+                    prev = float(vals[1])
+                    if prev:
+                        rec[f"{label}_qoq"] = float(vals[0]) / abs(prev) - (
+                            1 if prev > 0 else -1)
+                    if len(vals) >= 5 and float(vals[4]):
+                        base = float(vals[4])
+                        rec[f"{label}_yoy_q"] = float(vals[0]) / abs(base) - (
+                            1 if base > 0 else -1)
+                if rev is not None and len(rev):
+                    rec["quarter"] = pd.Timestamp(rev.index[0]).strftime("%b %Y")
+        except Exception:  # noqa: BLE001
+            rec = {}
+        cached[t] = rec
+        if n % 25 == 0:
+            _atomic_json(path, cached)
+
+    _atomic_json(path, cached)
+    return {t: cached.get(t, {}) for t in tickers}
 
 
 def fetch_rs_benchmark(period: str = "2y") -> pd.Series:
