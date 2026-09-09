@@ -131,12 +131,11 @@
     }
   ],
   "buyable": [
-    "AARTIPHARM.NS",
+    "ACE.NS",
     "ACMESOLAR.NS",
     "ADOR.NS",
     "AEROENTER.NS",
     "AETHER.NS",
-    "AJANTPHARM.NS",
     "AKUMS.NS",
     "ALIVUS.NS",
     "ANANDRATHI.NS",
@@ -145,21 +144,15 @@
     "ASKAUTOLTD.NS",
     "AVTNPL.NS",
     "AZAD.NS",
-    "BALAMINES.NS",
     "BEML.NS",
+    "BLUSPRING.NS",
     "BOSCH-HCIL.NS",
-    "BRIGADE.NS",
     "CAPLIPOINT.NS",
     "CARTRADE.NS",
     "CASTROLIND.NS",
-    "CHENNPETRO.NS",
     "CNL.NS",
-    "CONFIPET.NS",
     "CRAFTSMAN.NS",
     "DCBBANK.NS",
-    "DIVGIITTS.NS",
-    "EDELWEISS.NS",
-    "EIMCOELECO.NS",
-    "ELGIEQUIP.NS"
+    "EIMCOELECO.NS"
   ]
 }
