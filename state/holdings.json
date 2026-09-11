@@ -131,6 +131,7 @@
     }
   ],
   "buyable": [
+    "ACE.NS",
     "ADOR.NS",
     "AETHER.NS",
     "AKUMS.NS",
@@ -145,7 +146,7 @@
     "CAPLIPOINT.NS",
     "CARTRADE.NS",
     "CHENNPETRO.NS",
-    "CNL.NS",
+    "COMSYN.NS",
     "CONFIPET.NS",
     "CRAFTSMAN.NS",
     "DCBBANK.NS",
