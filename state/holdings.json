@@ -5,73 +5,8 @@
       "entry_date": "2026-09-08",
       "weight": 0.0475
     },
-    "PARAS.NS": {
-      "entry_price": 1527.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
     "AETHER.NS": {
       "entry_price": 1635.300048828125,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "NEULANDLAB.NS": {
-      "entry_price": 23770.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "GLAND.NS": {
-      "entry_price": 2961.10009765625,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "MARKSANS.NS": {
-      "entry_price": 335.95001220703125,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "INDOBORAX.NS": {
-      "entry_price": 511.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "FINCABLES.NS": {
-      "entry_price": 1301.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "MACPOWER.NS": {
-      "entry_price": 1875.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "NAVINFLUOR.NS": {
-      "entry_price": 8687.0,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "IPCALAB.NS": {
-      "entry_price": 1980.9000244140625,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "RPEL.NS": {
-      "entry_price": 1696.800048828125,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "REDINGTON.NS": {
-      "entry_price": 374.8500061035156,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "HAPPYFORGE.NS": {
-      "entry_price": 2230.699951171875,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "CNL.NS": {
-      "entry_price": 1153.699951171875,
       "entry_date": "2026-09-08",
       "weight": 0.0475
     },
@@ -80,28 +15,43 @@
       "entry_date": "2026-09-08",
       "weight": 0.0475
     },
-    "IRISDOREME.NS": {
-      "entry_price": 61.52000045776367,
-      "entry_date": "2026-09-08",
+    "DOLPHIN.NS": {
+      "entry_price": 628.0999755859375,
+      "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "NILKAMAL.NS": {
-      "entry_price": 2092.0,
-      "entry_date": "2026-09-08",
+    "CENTUM.NS": {
+      "entry_price": 4701.7001953125,
+      "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "ANANDRATHI.NS": {
-      "entry_price": 2221.199951171875,
-      "entry_date": "2026-09-08",
+    "DEEPINDS.NS": {
+      "entry_price": 749.0,
+      "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "KDDL.NS": {
-      "entry_price": 3996.199951171875,
-      "entry_date": "2026-09-08",
+    "ARROWGREEN.NS": {
+      "entry_price": 865.2000122070312,
+      "entry_date": "2026-10-01",
+      "weight": 0.0475
+    },
+    "AARTIPHARM.NS": {
+      "entry_price": 968.5,
+      "entry_date": "2026-10-01",
+      "weight": 0.0475
+    },
+    "ALIVUS.NS": {
+      "entry_price": 1374.199951171875,
+      "entry_date": "2026-10-01",
+      "weight": 0.0475
+    },
+    "EIMCOELECO.NS": {
+      "entry_price": 2268.800048828125,
+      "entry_date": "2026-10-01",
       "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-09-08",
+  "last_rebalance": "2026-10-01",
   "history": [
     {
       "date": "2026-09-08",
@@ -128,30 +78,57 @@
         "KDDL"
       ],
       "sold": []
+    },
+    {
+      "date": "2026-10-01",
+      "bought": [
+        "DOLPHIN",
+        "CENTUM",
+        "DEEPINDS",
+        "ARROWGREEN",
+        "AARTIPHARM",
+        "ALIVUS",
+        "EIMCOELECO"
+      ],
+      "sold": [
+        "PARAS",
+        "NEULANDLAB",
+        "GLAND",
+        "MARKSANS",
+        "INDOBORAX",
+        "FINCABLES",
+        "MACPOWER",
+        "NAVINFLUOR",
+        "IPCALAB",
+        "RPEL",
+        "REDINGTON",
+        "HAPPYFORGE",
+        "CNL",
+        "IRISDOREME",
+        "NILKAMAL",
+        "ANANDRATHI",
+        "KDDL"
+      ]
     }
   ],
   "buyable": [
     "AARTIPHARM.NS",
     "ACE.NS",
-    "ADOR.NS",
+    "AEGISLOG.NS",
     "AETHER.NS",
-    "AGI.NS",
     "AJANTPHARM.NS",
     "AKUMS.NS",
     "ALIVUS.NS",
-    "ANDHRAPAP.NS",
-    "ANTELOPUS.NS",
     "ARROWGREEN.NS",
-    "ASKAUTOLTD.NS",
     "AVALON.NS",
-    "AVTNPL.NS",
     "AZAD.NS",
+    "BIRLACABLE.NS",
     "BLSE.NS",
     "BLUSPRING.NS",
     "BOSCH-HCIL.NS",
     "CASTROLIND.NS",
     "CENTUM.NS",
-    "CONFIPET.NS",
+    "CYIENT.NS",
     "DEEPINDS.NS",
     "DOLPHIN.NS",
     "DYNAMATECH.NS",
