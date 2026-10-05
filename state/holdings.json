@@ -114,9 +114,6 @@
   "buyable": [
     "AARTIPHARM.NS",
     "ACE.NS",
-    "AEGISLOG.NS",
-    "AETHER.NS",
-    "AJANTPHARM.NS",
     "AKUMS.NS",
     "ALIVUS.NS",
     "ARROWGREEN.NS",
@@ -125,14 +122,9 @@
     "BIRLACABLE.NS",
     "BLSE.NS",
     "BLUSPRING.NS",
-    "BOSCH-HCIL.NS",
     "CASTROLIND.NS",
     "CENTUM.NS",
     "CYIENT.NS",
-    "DEEPINDS.NS",
-    "DOLPHIN.NS",
-    "DYNAMATECH.NS",
-    "EDELWEISS.NS",
-    "EIMCOELECO.NS"
+    "DEEPINDS.NS"
   ]
 }
