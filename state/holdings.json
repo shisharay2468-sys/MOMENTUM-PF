@@ -114,17 +114,24 @@
   "buyable": [
     "AARTIPHARM.NS",
     "ACE.NS",
+    "AETHER.NS",
+    "AJANTPHARM.NS",
     "AKUMS.NS",
     "ALIVUS.NS",
+    "ARIHANTCAP.NS",
     "ARROWGREEN.NS",
     "AVALON.NS",
     "AZAD.NS",
     "BIRLACABLE.NS",
     "BLSE.NS",
     "BLUSPRING.NS",
+    "BOSCH-HCIL.NS",
+    "CARBORUNIV.NS",
     "CASTROLIND.NS",
     "CENTUM.NS",
+    "CONFIPET.NS",
     "CYIENT.NS",
-    "DEEPINDS.NS"
+    "DEEPINDS.NS",
+    "EIMCOELECO.NS"
   ]
 }
