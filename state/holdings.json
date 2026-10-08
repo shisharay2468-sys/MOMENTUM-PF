@@ -20,11 +20,6 @@
       "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "CENTUM.NS": {
-      "entry_price": 4701.7001953125,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
     "DEEPINDS.NS": {
       "entry_price": 749.0,
       "entry_date": "2026-10-01",
@@ -49,9 +44,14 @@
       "entry_price": 2268.800048828125,
       "entry_date": "2026-10-01",
       "weight": 0.0475
+    },
+    "ARIHANTCAP.NS": {
+      "entry_price": 95.62000274658203,
+      "entry_date": "2026-10-08",
+      "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-10-01",
+  "last_rebalance": "2026-10-08",
   "history": [
     {
       "date": "2026-09-08",
@@ -109,26 +109,27 @@
         "ANANDRATHI",
         "KDDL"
       ]
+    },
+    {
+      "date": "2026-10-08",
+      "bought": [
+        "ARIHANTCAP"
+      ],
+      "sold": [
+        "CENTUM"
+      ]
     }
   ],
   "buyable": [
-    "AARTIPHARM.NS",
-    "ACE.NS",
-    "AEGISLOG.NS",
     "AETHER.NS",
     "AKUMS.NS",
-    "ALIVUS.NS",
-    "ARROWGREEN.NS",
-    "ASKAUTOLTD.NS",
+    "ALICON.NS",
+    "ARIHANTCAP.NS",
     "AVALON.NS",
     "AZAD.NS",
     "BIRLACABLE.NS",
-    "BLUSPRING.NS",
     "BOSCH-HCIL.NS",
-    "CASTROLIND.NS",
     "CHENNPETRO.NS",
-    "CONFIPET.NS",
-    "CYIENT.NS",
     "DEEPINDS.NS",
     "DYNAMATECH.NS",
     "EIMCOELECO.NS"
