@@ -30,11 +30,6 @@
       "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "AARTIPHARM.NS": {
-      "entry_price": 968.5,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
     "ALIVUS.NS": {
       "entry_price": 1374.199951171875,
       "entry_date": "2026-10-01",
@@ -49,9 +44,14 @@
       "entry_price": 95.62000274658203,
       "entry_date": "2026-10-08",
       "weight": 0.0475
+    },
+    "AVTNPL.NS": {
+      "entry_price": 94.77999877929688,
+      "entry_date": "2026-10-09",
+      "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-10-08",
+  "last_rebalance": "2026-10-09",
   "history": [
     {
       "date": "2026-09-08",
@@ -118,19 +118,32 @@
       "sold": [
         "CENTUM"
       ]
+    },
+    {
+      "date": "2026-10-09",
+      "bought": [
+        "AVTNPL"
+      ],
+      "sold": [
+        "AARTIPHARM"
+      ]
     }
   ],
   "buyable": [
     "AETHER.NS",
-    "AKUMS.NS",
     "ALICON.NS",
     "ARIHANTCAP.NS",
+    "ARROWGREEN.NS",
     "AVALON.NS",
+    "AVTNPL.NS",
     "AZAD.NS",
     "BIRLACABLE.NS",
+    "BLUSPRING.NS",
     "BOSCH-HCIL.NS",
     "CHENNPETRO.NS",
+    "CYIENT.NS",
     "DEEPINDS.NS",
+    "DHAMPURSUG.NS",
     "DYNAMATECH.NS",
     "EIMCOELECO.NS"
   ]
