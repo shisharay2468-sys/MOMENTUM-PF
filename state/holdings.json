@@ -130,20 +130,19 @@
     }
   ],
   "buyable": [
+    "ACE.NS",
+    "AEGISLOG.NS",
     "AETHER.NS",
     "ALICON.NS",
     "ARIHANTCAP.NS",
-    "ARROWGREEN.NS",
     "AVALON.NS",
     "AVTNPL.NS",
     "AZAD.NS",
     "BIRLACABLE.NS",
-    "BLUSPRING.NS",
     "BOSCH-HCIL.NS",
-    "CHENNPETRO.NS",
+    "CARTRADE.NS",
     "CYIENT.NS",
     "DEEPINDS.NS",
-    "DHAMPURSUG.NS",
     "DYNAMATECH.NS",
     "EIMCOELECO.NS"
   ]
