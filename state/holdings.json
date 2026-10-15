@@ -1,10 +1,5 @@
 {
   "holdings": {
-    "AVALON.NS": {
-      "entry_price": 2340.800048828125,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
     "AETHER.NS": {
       "entry_price": 1635.300048828125,
       "entry_date": "2026-09-08",
@@ -49,9 +44,14 @@
       "entry_price": 94.77999877929688,
       "entry_date": "2026-10-09",
       "weight": 0.0475
+    },
+    "BHAGERIA.NS": {
+      "entry_price": 360.1000061035156,
+      "entry_date": "2026-10-15",
+      "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-10-09",
+  "last_rebalance": "2026-10-15",
   "history": [
     {
       "date": "2026-09-08",
@@ -127,23 +127,30 @@
       "sold": [
         "AARTIPHARM"
       ]
+    },
+    {
+      "date": "2026-10-15",
+      "bought": [
+        "BHAGERIA"
+      ],
+      "sold": [
+        "AVALON"
+      ]
     }
   ],
   "buyable": [
-    "ACE.NS",
     "AEGISLOG.NS",
     "ALICON.NS",
+    "ARFIN.NS",
     "ARIHANTCAP.NS",
     "AURUM.NS",
-    "AVALON.NS",
     "AVTNPL.NS",
-    "AZAD.NS",
+    "BHAGERIA.NS",
     "BIRLACABLE.NS",
     "BOSCH-HCIL.NS",
-    "CARTRADE.NS",
-    "CHENNPETRO.NS",
     "CYIENT.NS",
     "DEEPINDS.NS",
+    "DHAMPURSUG.NS",
     "DYNAMATECH.NS",
     "EIMCOELECO.NS"
   ]
