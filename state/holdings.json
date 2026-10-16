@@ -139,19 +139,17 @@
     }
   ],
   "buyable": [
-    "AEGISLOG.NS",
     "ALICON.NS",
-    "ARFIN.NS",
     "ARIHANTCAP.NS",
-    "AURUM.NS",
     "AVTNPL.NS",
     "BHAGERIA.NS",
-    "BIRLACABLE.NS",
-    "BOSCH-HCIL.NS",
+    "CASTROLIND.NS",
     "CYIENT.NS",
+    "CYIENTDLM.NS",
     "DEEPINDS.NS",
     "DHAMPURSUG.NS",
     "DYNAMATECH.NS",
+    "EBGNG.NS",
     "EIMCOELECO.NS"
   ]
 }
