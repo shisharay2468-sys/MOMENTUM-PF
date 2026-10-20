@@ -20,11 +20,6 @@
       "entry_date": "2026-10-01",
       "weight": 0.0475
     },
-    "ARROWGREEN.NS": {
-      "entry_price": 865.2000122070312,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
     "ALIVUS.NS": {
       "entry_price": 1374.199951171875,
       "entry_date": "2026-10-01",
@@ -49,9 +44,14 @@
       "entry_price": 360.1000061035156,
       "entry_date": "2026-10-15",
       "weight": 0.0475
+    },
+    "ALICON.NS": {
+      "entry_price": 850.8499755859375,
+      "entry_date": "2026-10-20",
+      "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-10-15",
+  "last_rebalance": "2026-10-20",
   "history": [
     {
       "date": "2026-09-08",
@@ -136,18 +136,23 @@
       "sold": [
         "AVALON"
       ]
+    },
+    {
+      "date": "2026-10-20",
+      "bought": [
+        "ALICON"
+      ],
+      "sold": [
+        "ARROWGREEN"
+      ]
     }
   ],
   "buyable": [
     "ALICON.NS",
-    "ARIHANTCAP.NS",
     "AVTNPL.NS",
     "BHAGERIA.NS",
-    "CASTROLIND.NS",
+    "BLUSPRING.NS",
     "CYIENT.NS",
-    "CYIENTDLM.NS",
-    "DEEPINDS.NS",
-    "DHAMPURSUG.NS",
     "DYNAMATECH.NS",
     "EBGNG.NS",
     "EIMCOELECO.NS"
