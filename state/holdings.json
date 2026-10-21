@@ -1,15 +1,5 @@
 {
   "holdings": {
-    "AETHER.NS": {
-      "entry_price": 1635.300048828125,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
-    "CONFIPET.NS": {
-      "entry_price": 83.58999633789062,
-      "entry_date": "2026-09-08",
-      "weight": 0.0475
-    },
     "DOLPHIN.NS": {
       "entry_price": 628.0999755859375,
       "entry_date": "2026-10-01",
@@ -49,9 +39,19 @@
       "entry_price": 850.8499755859375,
       "entry_date": "2026-10-20",
       "weight": 0.0475
+    },
+    "DHAMPURSUG.NS": {
+      "entry_price": 192.91000366210938,
+      "entry_date": "2026-10-21",
+      "weight": 0.0475
+    },
+    "CYIENT.NS": {
+      "entry_price": 1169.699951171875,
+      "entry_date": "2026-10-21",
+      "weight": 0.0475
     }
   },
-  "last_rebalance": "2026-10-20",
+  "last_rebalance": "2026-10-21",
   "history": [
     {
       "date": "2026-09-08",
@@ -145,16 +145,25 @@
       "sold": [
         "ARROWGREEN"
       ]
+    },
+    {
+      "date": "2026-10-21",
+      "bought": [
+        "DHAMPURSUG",
+        "CYIENT"
+      ],
+      "sold": [
+        "AETHER",
+        "CONFIPET"
+      ]
     }
   ],
   "buyable": [
     "ALICON.NS",
-    "AVTNPL.NS",
+    "ANANDRATHI.NS",
     "BHAGERIA.NS",
     "BLUSPRING.NS",
     "CYIENT.NS",
-    "DYNAMATECH.NS",
-    "EBGNG.NS",
-    "EIMCOELECO.NS"
+    "DHAMPURSUG.NS"
   ]
 }
