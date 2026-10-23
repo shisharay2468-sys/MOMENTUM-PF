@@ -1,28 +1,8 @@
 {
   "holdings": {
-    "DOLPHIN.NS": {
-      "entry_price": 628.0999755859375,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
-    "DEEPINDS.NS": {
-      "entry_price": 749.0,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
-    "ALIVUS.NS": {
-      "entry_price": 1374.199951171875,
-      "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
     "EIMCOELECO.NS": {
       "entry_price": 2268.800048828125,
       "entry_date": "2026-10-01",
-      "weight": 0.0475
-    },
-    "ARIHANTCAP.NS": {
-      "entry_price": 95.62000274658203,
-      "entry_date": "2026-10-08",
       "weight": 0.0475
     },
     "AVTNPL.NS": {
@@ -49,9 +29,14 @@
       "entry_price": 1169.699951171875,
       "entry_date": "2026-10-21",
       "weight": 0.0475
+    },
+    "ANANDRATHI.NS": {
+      "entry_price": 2235.0,
+      "entry_date": "2026-10-23",
+      "weight": 0.06785714285714285
     }
   },
-  "last_rebalance": "2026-10-21",
+  "last_rebalance": "2026-10-23",
   "history": [
     {
       "date": "2026-09-08",
@@ -156,12 +141,22 @@
         "AETHER",
         "CONFIPET"
       ]
+    },
+    {
+      "date": "2026-10-23",
+      "bought": [
+        "ANANDRATHI"
+      ],
+      "sold": [
+        "DOLPHIN",
+        "DEEPINDS",
+        "ALIVUS"
+      ]
     }
   ],
   "buyable": [
     "ANANDRATHI.NS",
     "BHAGERIA.NS",
-    "BLUSPRING.NS",
-    "EIMCOELECO.NS"
+    "CYIENT.NS"
   ]
 }
