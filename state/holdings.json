@@ -20,11 +20,6 @@
       "entry_date": "2026-10-20",
       "weight": 0.0475
     },
-    "DHAMPURSUG.NS": {
-      "entry_price": 192.91000366210938,
-      "entry_date": "2026-10-21",
-      "weight": 0.0475
-    },
     "CYIENT.NS": {
       "entry_price": 1169.699951171875,
       "entry_date": "2026-10-21",
@@ -34,9 +29,24 @@
       "entry_price": 2235.0,
       "entry_date": "2026-10-23",
       "weight": 0.06785714285714285
+    },
+    "CHENNPETRO.NS": {
+      "entry_price": 1573.800048828125,
+      "entry_date": "2026-10-27",
+      "weight": 0.05277777777777777
+    },
+    "DPABHUSHAN.NS": {
+      "entry_price": 2081.5,
+      "entry_date": "2026-10-27",
+      "weight": 0.05277777777777777
+    },
+    "BLUSPRING.NS": {
+      "entry_price": 154.25999450683594,
+      "entry_date": "2026-10-27",
+      "weight": 0.05277777777777777
     }
   },
-  "last_rebalance": "2026-10-23",
+  "last_rebalance": "2026-10-27",
   "history": [
     {
       "date": "2026-09-08",
@@ -152,11 +162,26 @@
         "DEEPINDS",
         "ALIVUS"
       ]
+    },
+    {
+      "date": "2026-10-27",
+      "bought": [
+        "CHENNPETRO",
+        "DPABHUSHAN",
+        "BLUSPRING"
+      ],
+      "sold": [
+        "DHAMPURSUG"
+      ]
     }
   ],
   "buyable": [
     "ANANDRATHI.NS",
     "BHAGERIA.NS",
-    "CYIENT.NS"
+    "BLUSPRING.NS",
+    "CHENNPETRO.NS",
+    "CYIENT.NS",
+    "DPABHUSHAN.NS",
+    "EBGNG.NS"
   ]
 }
