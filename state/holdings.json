@@ -176,9 +176,10 @@
     }
   ],
   "buyable": [
-    "ALIVUS.NS",
     "ANANDRATHI.NS",
     "BHAGERIA.NS",
-    "CHENNPETRO.NS"
+    "BLUSPRING.NS",
+    "CHENNPETRO.NS",
+    "EBGNG.NS"
   ]
 }
