@@ -176,12 +176,14 @@
     }
   ],
   "buyable": [
+    "AARTIPHARM.NS",
     "ABDL.NS",
     "ACUTAAS.NS",
     "AGARWALEYE.NS",
+    "ALIVUS.NS",
     "ANANDRATHI.NS",
-    "ASKAUTOLTD.NS",
     "BHAGERIA.NS",
-    "BLUSPRING.NS"
+    "BLUSPRING.NS",
+    "DIACABS.NS"
   ]
 }
