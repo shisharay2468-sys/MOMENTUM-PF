@@ -181,8 +181,13 @@
     }
   ],
   "buyable": [
+    "AARTIDRUGS.NS",
     "AARTIPHARM.NS",
     "ABDL.NS",
-    "ANANDRATHI.NS"
+    "ACUTAAS.NS",
+    "ANANDRATHI.NS",
+    "AVTNPL.NS",
+    "BLUSPRING.NS",
+    "CNL.NS"
   ]
 }
