@@ -181,15 +181,14 @@
     }
   ],
   "buyable": [
-    "AARTIDRUGS.NS",
-    "AARTIPHARM.NS",
     "ABDL.NS",
     "AGARWALEYE.NS",
-    "ALIVUS.NS",
     "ANANDRATHI.NS",
-    "AVTNPL.NS",
+    "ANTHEM.NS",
     "BLUSPRING.NS",
+    "BOROLTD.NS",
     "CNL.NS",
-    "CRAFTSMAN.NS"
+    "CRAFTSMAN.NS",
+    "DCBBANK.NS"
   ]
 }
