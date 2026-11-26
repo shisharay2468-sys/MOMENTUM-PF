@@ -5,11 +5,6 @@
       "entry_date": "2026-10-09",
       "weight": 0.0475
     },
-    "BHAGERIA.NS": {
-      "entry_price": 360.1000061035156,
-      "entry_date": "2026-10-15",
-      "weight": 0.0475
-    },
     "ALICON.NS": {
       "entry_price": 850.8499755859375,
       "entry_date": "2026-10-20",
@@ -39,9 +34,24 @@
       "entry_price": 791.6500244140625,
       "entry_date": "2026-11-19",
       "weight": 0.11875
+    },
+    "CNL.NS": {
+      "entry_price": 1351.699951171875,
+      "entry_date": "2026-11-27",
+      "weight": 0.095
+    },
+    "APLLTD.NS": {
+      "entry_price": 1030.449951171875,
+      "entry_date": "2026-11-27",
+      "weight": 0.095
+    },
+    "CRAFTSMAN.NS": {
+      "entry_price": 11769.0,
+      "entry_date": "2026-11-27",
+      "weight": 0.095
     }
   },
-  "last_rebalance": "2026-11-19",
+  "last_rebalance": "2026-11-27",
   "history": [
     {
       "date": "2026-09-08",
@@ -178,14 +188,28 @@
       "sold": [
         "CHENNPETRO"
       ]
+    },
+    {
+      "date": "2026-11-27",
+      "bought": [
+        "CNL",
+        "APLLTD",
+        "CRAFTSMAN"
+      ],
+      "sold": [
+        "BHAGERIA"
+      ]
     }
   ],
   "buyable": [
     "AARTIPHARM.NS",
     "ABDL.NS",
+    "AGARWALEYE.NS",
+    "ALICON.NS",
     "ANANDRATHI.NS",
     "ANTHEM.NS",
     "APLLTD.NS",
-    "CNL.NS"
+    "CNL.NS",
+    "CRAFTSMAN.NS"
   ]
 }
