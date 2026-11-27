@@ -202,14 +202,17 @@
     }
   ],
   "buyable": [
+    "AARTIDRUGS.NS",
     "AARTIPHARM.NS",
     "ABDL.NS",
     "AGARWALEYE.NS",
     "ALICON.NS",
     "ANANDRATHI.NS",
+    "ANGELONE.NS",
     "ANTHEM.NS",
     "APLLTD.NS",
-    "CNL.NS",
+    "ASAHIINDIA.NS",
+    "CPPLUS.NS",
     "CRAFTSMAN.NS"
   ]
 }
